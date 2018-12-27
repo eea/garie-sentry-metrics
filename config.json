@@ -1,0 +1,11 @@
+{
+    "cron": "20 */1 * * *",
+    "urls": [
+        {
+            "url": "https://sentry.eea.europa.eu/api/0/projects/eea/www/events/"
+        },
+        {
+            "url": "https://matomo.eea.europa.eu/"
+        }
+    ]
+}
