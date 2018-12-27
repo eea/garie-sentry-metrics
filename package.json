@@ -1,9 +1,9 @@
 {
-    "name": "garie-pagespeed-insights",
+    "name": "garie-sentry-metrics",
     "version": "0.0.1",
-    "description": "Google Pagespeed insights image for performance metrics",
+    "description": "Sentry image for performance metrics",
     "license": "MIT",
-    "repository": "boyney123/garie-pagespeed-insights",
+    "repository": "eea/garie-sentry-metrics",
     "author": {
         "name": "David Boyne",
         "email": "davidboyne123@hotmail.co.uk"
@@ -12,8 +12,8 @@
         "node": ">=6"
     },
     "scripts": {
-        "test": "SENTRY_AUTHORIZATION=1234 ENV=test jest --coverage --config jest.config.json",
-        "test:watch": "SENTRY_AUTHORIZATION=1234 ENV=test jest --watch --notify --notifyMode=change --coverage --config jest.config.json",
+        "test": "ENV=test jest --coverage --config jest.config.json",
+        "test:watch": "ENV=test jest --watch --notify --notifyMode=change --coverage --config jest.config.json",
         "start": "node ./src/index.js"
     },
     "files": [

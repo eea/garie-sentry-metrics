@@ -18,6 +18,7 @@ services:
             - HOST=influxdb
             - SENTRY_AUTHORIZATION=
             - MATOMO_TOKEN=
+            - REPORT_DIR
         depends_on:
             - influxdb
     chronograf:
