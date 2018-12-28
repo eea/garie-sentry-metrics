@@ -5,8 +5,8 @@
     "license": "MIT",
     "repository": "eea/garie-sentry-metrics",
     "author": {
-        "name": "David Boyne",
-        "email": "davidboyne123@hotmail.co.uk"
+        "name": "European Environment Agency: IDM2 A-Team",
+        "email": "eea-edw-a-team-alerts@googlegroups.com"
     },
     "engines": {
         "node": ">=6"

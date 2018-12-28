@@ -1,11 +1,11 @@
 const { getData } = require('./');
-const pageSpeedInsightData = require('../../test/mock-data/sentry-metrics.json');
+const sentryMetricsData = require('../../test/mock-data/sentry-metrics.json');
 
 const nock = require('nock');
 
 nock('https://www.googleapis.com')
     .get('/pagespeedonline/v4/runPagespeed?url=www.test.co.uk&strategy=mobile&key=1234')
-    .reply(200, pageSpeedInsightData);
+    .reply(200, sentryMetricsData);
 
 describe('sentry-metrics', () => {
     describe('getData', () => {
