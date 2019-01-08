@@ -18,6 +18,8 @@ services:
             - HOST=influxdb
             - SENTRY_AUTHORIZATION=
             - MATOMO_TOKEN=
+            - URL_MATOMO=
+            - URL_SENTRY=
             - REPORT_DIR
         depends_on:
             - influxdb

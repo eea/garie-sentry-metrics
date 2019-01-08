@@ -2,6 +2,7 @@ const request = require('supertest');
 const express = require('express');
 const router = express.Router();
 const { getData } = require('../../sentry-metrics');
+const { getDataMatomo } = require('../../sentry-metrics');
 const { saveData } = require('../../influx');
 const { saveDataMatomo } = require('../../influx');
 // const saveReport = require('../../utils/save-report');
@@ -10,13 +11,15 @@ const { app } = require('../../');
 
 jest.mock('../../sentry-metrics', () => {
     return {
-        getData: jest.fn(() => Promise.resolve())
+        getData: jest.fn(() => Promise.resolve()),
+        getDataMatomo: jest.fn(() => Promise.resolve())
     };
 });
 
 jest.mock('../../influx', () => {
     return {
-        saveData: jest.fn(() => Promise.resolve())
+        saveData: jest.fn(() => Promise.resolve()),
+        saveDataMatomo: jest.fn(() => Promise.resolve())
     };
 });
 
@@ -25,6 +28,7 @@ jest.mock('../../influx', () => {
 describe('webhooks', () => {
     beforeEach(() => {
         getData.mockClear();
+        getDataMatomo.mockClear();
         saveData.mockClear();
         saveDataMatomo.mockClear();
         // saveReport.mockClear();
@@ -40,6 +44,7 @@ describe('webhooks', () => {
 
         it('returns a 500 when trying to getData from sentry-metrics but it fails', async () => {
             getData.mockRejectedValue();
+            getDataMatomo.mockRejectedValue();
 
             await request(app)
                 .post('/collect')
@@ -63,6 +68,7 @@ describe('webhooks', () => {
             saveData.mockResolvedValue();
             saveDataMatomo.mockRejectedValue();
             getData.mockResolvedValue();
+            getDataMatomo.mockResolvedValue();
 
             request(app)
                 .post('/collect')

@@ -1,45 +1,47 @@
 const logger = require('../utils/logger');
 const request = require('request-promise');
 
-const getData = async url => {
+const getData = async (url, sentryId) => {
     return new Promise(async (resolve, reject) => {
-        logger.info(`Getting data for ${url}`);
-
-        if (process.env.SENTRY_AUTHORIZATION === undefined) {
-            return reject('Missing SENTRY_AUTHORIZATION');
-        }
-
-        if (process.env.MATOMO_TOKEN === undefined) {
-            return reject('Missing MATOMO_TOKEN');
-        }
+        logger.info(`Getting sentry data for ${url}`);
 
         try {
-            if (url.indexOf('matomo') > -1) {
-                const data = await request({
-                    uri: `${url}index.php?module=API&method=VisitsSummary.get&idSite=3&period=day&date=yesterday&format=JSON&token_auth=${process.env.MATOMO_TOKEN}`,
-                    json: true
-                });
-                resolve(data);
-            }
-            else {
-                const data = await request({
-                    uri: url,
-                    json: true,
-                    resolveWithFullResponse: true,
-                    headers: {
-                        'Authorization': `Bearer ${process.env.SENTRY_AUTHORIZATION}`
-                    }
-                });
+            const data = await request({
+                uri: `${process.env.URL_SENTRY}api/0/projects/eea/${sentryId}/events/`,
+                json: true,
+                resolveWithFullResponse: true,
+                headers: {
+                    'Authorization': `Bearer ${process.env.SENTRY_AUTHORIZATION}`
+                }
+            });
 
-                // var data = makeRequest(url);
-                // Verify if more next data is needed, if so get nextUrl
+            // var data = makeRequest(url);
+            // Verify if more next data is needed, if so get nextUrl
 
-                resolve(data.body);
-                logger.info(`Successfull got data for ${url}`);
-            }
+            resolve(data.body);
+            logger.info(`Successfull got sentry data for ${url}`);
         } catch (err) {
-            logger.warn(`Failed to get data for ${url}`, err);
-            reject(`Failed to get data for ${url}`);
+            logger.warn(`Failed to get sentry data for ${url}`, err);
+            reject(`Failed to get sentry data for ${url}`);
+        }
+    });
+};
+
+
+const getDataMatomo = async (url, matomoId) => {
+    return new Promise(async (resolve, reject) => {
+        logger.info(`Getting matomo data for ${url}`);
+
+        try {
+            const data = await request({
+                uri: `${process.env.URL_MATOMO}index.php?module=API&method=VisitsSummary.get&idSite=3&period=day&date=yesterday&format=JSON&token_auth=${process.env.MATOMO_TOKEN}`,
+                json: true
+            });
+            resolve(data);
+
+        } catch (err) {
+            logger.warn(`Failed to get matomo data for ${url}`, err);
+            reject(`Failed to get matomo data for ${url}`);
         }
     });
 };
@@ -70,5 +72,6 @@ function getNextUrl(data) {
 }
 
 module.exports = {
-    getData
+    getData,
+    getDataMatomo
 };

@@ -69,6 +69,7 @@ describe('main', () => {
         //Tidy this up?
         setTimeout(() => {
             expect(sentryMetrics.getData).toHaveBeenCalledWith('https://www.test.com');
+            expect(sentryMetrics.getDataMatomo).toHaveBeenCalledWith('https://www.test.com');
             expect(influx.saveData).toHaveBeenCalled();
             expect(influx.saveDataMatomo).toHaveBeenCalled();
             done();

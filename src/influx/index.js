@@ -69,11 +69,11 @@ const saveData = async (url, data) => {
         });
 
         const result = await influx.writePoints(js_events.concat(server_errors));
-        logger.info(`Successfully saved sentry-metrics data for ${url}`);
+        logger.info(`Successfully saved sentry-metrics sentry data for ${url}`);
         return result;
     } catch (err) {
-        logger.error(`Failed to save sentry-metrics data for ${url}`, err);
-        return Promise.reject(`Failed to save data into influxdb for ${url}`);
+        logger.error(`Failed to save sentry-metrics sentry data for ${url}`, err);
+        return Promise.reject(`Failed to save sentry data into influxdb for ${url}`);
     }
 };
 

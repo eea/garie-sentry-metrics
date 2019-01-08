@@ -1,11 +1,27 @@
 {
-    "cron": "20 */1 * * *",
-    "urls": [
+  "cron": "0 */4 * * *",
+  "urls": [
+    {
+      "url": "https://www.eea.europa.eu/",
+      "sentryId": "SENTRYID",
+      "matomoId": 1,
+      "plugins": [
         {
-            "url": "https://sentry.eea.europa.eu/api/0/projects/eea/www/events/"
-        },
-        {
-            "url": "https://matomo.eea.europa.eu/"
+          "name": "lighthouse",
+          "report": true
         }
-    ]
+      ]
+    },
+    {
+      "url": "https://biodiversity.europa.eu/",
+      "sentryId": "SENTRYID",
+      "matomoId": 1,
+      "plugins": [
+        {
+          "name": "lighthouse",
+          "report": true
+        }
+      ]
+    }
+  ]
 }

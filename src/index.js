@@ -8,7 +8,7 @@ const config = require('../config');
 
 const { init, saveData, saveDataMatomo } = require('./influx');
 
-const { getData } = require('./sentry-metrics');
+const { getData, getDataMatomo } = require('./sentry-metrics');
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,14 +20,14 @@ app.use('/collect', collect);
 const getDataForAllUrls = async () => {
     for (const item of urls) {
         const { url } = item;
+        const { sentryId } = item;
+        const { matomoId } = item;
+
         try {
-            const data = await getData(url);
-            if (url.indexOf('matomo') > -1) {
-                await saveDataMatomo(url, data);
-            }
-            else {
-                await saveData(url, data);
-            }
+            const data = await getData(url, sentryId);
+            const data_matomo = await getDataMatomo(url, matomoId);
+            await saveDataMatomo(url, data_matomo);
+            await saveData(url, data);
         } catch (err) {
             logger.error(url, data);
             logger.error(`Failed to parse ${url}`, err);
@@ -62,11 +62,6 @@ if (process.env.ENV !== 'test') {
         console.log('Application listening on port 3000');
         await main();
     });
-}
-
-if (!process.env.SENTRY_AUTHORIZATION) {
-    logger.error('Missing SENTRY_AUTHORIZATION KEY. Please go to https://developers.google.com/speed/docs/insights/v4/first-app to get one');
-    process.exit(1);
 }
 
 module.exports = {

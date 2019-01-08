@@ -49,7 +49,7 @@ describe('influxdb', () => {
                     measurement: 'firstname',
                     tags: {
                         ids: 'id',
-                        date: 'id',
+                        date: 'date',
                         url: 'eventurl'
                     },
                     fields: {
@@ -60,7 +60,7 @@ describe('influxdb', () => {
                     measurement: 'lastname',
                     tags: {
                         ids: 'id',
-                        date: 'id',
+                        date: 'date',
                         url: 'eventurl'
                     },
                     fields: {
@@ -78,7 +78,7 @@ describe('influxdb', () => {
                     measurement: 'firstname',
                     tags: {
                         ids: 'id',
-                        date: 'id',
+                        date: 'date',
                         url: 'eventurl'
                     },
                     fields: {
