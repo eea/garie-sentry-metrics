@@ -34,7 +34,7 @@ const getDataMatomo = async (url, matomoId) => {
 
         try {
             const data = await request({
-                uri: `${process.env.URL_MATOMO}index.php?module=API&method=VisitsSummary.get&idSite=3&period=day&date=yesterday&format=JSON&token_auth=${process.env.MATOMO_TOKEN}`,
+                uri: `${process.env.URL_MATOMO}index.php?module=API&method=VisitsSummary.get&idSite=${matomoId}&period=day&date=yesterday&format=JSON&token_auth=${process.env.MATOMO_TOKEN}`,
                 json: true
             });
             resolve(data);
