@@ -3,8 +3,8 @@
   "urls": [
     {
       "url": "https://www.eea.europa.eu/",
-      "sentryId": "SENTRYID",
-      "matomoId": 1,
+      "sentryId": "www",
+      "matomoId": 3,
       "plugins": [
         {
           "name": "lighthouse",
@@ -14,8 +14,8 @@
     },
     {
       "url": "https://biodiversity.europa.eu/",
-      "sentryId": "SENTRYID",
-      "matomoId": 1,
+      "sentryId": "elastic-apps",
+      "matomoId": 12,
       "plugins": [
         {
           "name": "lighthouse",
