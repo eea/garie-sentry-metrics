@@ -10,9 +10,6 @@ router.post('/', async (req, res, next) => {
     const { body = {} } = req;
     const { url, report = false } = body;
 
-    console.log("BODY")
-    console.log(body)
-
     if (!url) {
         logger.info('/collect missing `url` data');
         return res.sendStatus(400);

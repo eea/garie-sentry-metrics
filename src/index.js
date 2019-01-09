@@ -23,6 +23,10 @@ const getDataForAllUrls = async () => {
         const { sentryId } = item;
         const { matomoId } = item;
 
+        if (!matomoId || !sentryId) {
+            continue;
+        }
+
         try {
             const data = await getData(url, sentryId);
             const data_matomo = await getDataMatomo(url, matomoId);
