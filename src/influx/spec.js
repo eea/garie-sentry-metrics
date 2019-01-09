@@ -51,7 +51,9 @@ describe('influxdb', () => {
                         url: 'https://www.test.com'
                     },
                     fields: {
-                        value: 1.0000000000
+                        value: 1.0000000000,
+                        total_visits: 1,
+                        sentry_events: 1
                     }
                 },
                 {
@@ -60,7 +62,9 @@ describe('influxdb', () => {
                         url: 'https://www.test.com'
                     },
                     fields: {
-                        value: 1.0000000000
+                        value: 1.0000000000,
+                        total_visits: 1,
+                        sentry_events: 1
                     }
                 }
             ]);
@@ -76,7 +80,9 @@ describe('influxdb', () => {
                         url: 'https://www.test.com'
                     },
                     fields: {
-                        value: 1.0000000000
+                        value: 1.0000000000,
+                        total_visits: 1,
+                        sentry_events: 1
                     }
                 }
             ]);
