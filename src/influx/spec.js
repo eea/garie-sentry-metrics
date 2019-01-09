@@ -1,4 +1,4 @@
-const { saveData, init, saveDataMatomo } = require('./index');
+const { saveData, init } = require('./index');
 const influx = require('./influx');
 
 jest.mock('./influx', () => {
@@ -48,23 +48,19 @@ describe('influxdb', () => {
                 {
                     measurement: 'firstname',
                     tags: {
-                        ids: 'id',
-                        date: 'date',
-                        url: 'eventurl'
+                        url: 'https://www.test.com'
                     },
                     fields: {
-                        date: 'eventdate',
+                        value: 1.0000000000
                     }
                 },
                 {
                     measurement: 'lastname',
                     tags: {
-                        ids: 'id',
-                        date: 'date',
-                        url: 'eventurl'
+                        url: 'https://www.test.com'
                     },
                     fields: {
-                        date: 'eventdate',
+                        value: 1.0000000000
                     }
                 }
             ]);
@@ -77,12 +73,10 @@ describe('influxdb', () => {
                 {
                     measurement: 'firstname',
                     tags: {
-                        ids: 'id',
-                        date: 'date',
-                        url: 'eventurl'
+                        url: 'https://www.test.com'
                     },
                     fields: {
-                        date: 'eventdate',
+                        value: 1.0000000000
                     }
                 }
             ]);
@@ -91,54 +85,6 @@ describe('influxdb', () => {
         it('rejects when writePoints fails to write into influxdb', async () => {
             influx.writePoints.mockRejectedValue();
             await expect(saveData('https://www.test.co.uk', { firstname: 'bob', lastname: undefined })).rejects.toEqual('Failed to save data into influxdb for https://www.test.co.uk');
-        });
-    });
-
-    describe('saveDataMatomo', () => {
-        it('writes influxdb points into the database for each property on a given object if it has values', async () => {
-            const result = await saveDataMatomo('https://www.test.com', { firstname: 'bob', lastname: 'bob' });
-
-            expect(influx.writePoints).toHaveBeenCalledWith([
-                {
-                    measurement: 'firstname',
-                    tags: {
-                        url: 'https://www.test.com'
-                    },
-                    fields: {
-                        value: 1.0
-                    }
-                },
-                {
-                    measurement: 'lastname',
-                    tags: {
-                        url: 'https://www.test.com'
-                    },
-                    fields: {
-                        value: 1.0
-                    }
-                }
-            ]);
-        });
-
-        it('does not write influxdb points into the database for any property that does not have a value', async () => {
-            await saveDataMatomo('https://www.test.com', { firstname: 'bob', lastname: undefined });
-
-            expect(influx.writePoints).toBeCalledWith([
-                {
-                    measurement: 'firstname',
-                    tags: {
-                        url: 'https://www.test.com'
-                    },
-                    fields: {
-                        value: 1.0
-                    }
-                }
-            ]);
-        });
-
-        it('rejects when writePoints fails to write into influxdb', async () => {
-            influx.writePoints.mockRejectedValue();
-            await expect(saveDataMatomo('https://www.test.co.uk', { firstname: 'bob', lastname: undefined })).rejects.toEqual('Failed to save data into influxdb for https://www.test.co.uk');
         });
     });
 });

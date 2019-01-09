@@ -6,9 +6,9 @@ const collect = require('./routes/collect');
 const logger = require('./utils/logger');
 const config = require('../config');
 
-const { init, saveData, saveDataMatomo } = require('./influx');
+const { init, saveData } = require('./influx');
 
-const { getData, getDataMatomo } = require('./sentry-metrics');
+const { getData } = require('./sentry-metrics');
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,9 +28,7 @@ const getDataForAllUrls = async () => {
         }
 
         try {
-            const data = await getData(url, sentryId);
-            const data_matomo = await getDataMatomo(url, matomoId);
-            await saveDataMatomo(url, data_matomo);
+            const data = await getData(url, sentryId, matomoId);
             await saveData(url, data);
         } catch (err) {
             logger.error(url, data);

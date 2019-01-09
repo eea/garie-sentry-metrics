@@ -7,8 +7,7 @@ const sentryMetrics = require('./sentry-metrics');
 jest.mock('./influx', () => {
     return {
         init: jest.fn(),
-        saveData: jest.fn(() => Promise.resolve()),
-        saveDataMatomo: jest.fn(() => Promise.resolve())
+        saveData: jest.fn(() => Promise.resolve())
     };
 });
 
@@ -69,9 +68,7 @@ describe('main', () => {
         //Tidy this up?
         setTimeout(() => {
             expect(sentryMetrics.getData).toHaveBeenCalledWith('https://www.test.com');
-            expect(sentryMetrics.getDataMatomo).toHaveBeenCalledWith('https://www.test.com');
             expect(influx.saveData).toHaveBeenCalled();
-            expect(influx.saveDataMatomo).toHaveBeenCalled();
             done();
         }, 500);
     });
