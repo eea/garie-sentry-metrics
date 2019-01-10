@@ -1,7 +1,7 @@
 FROM node:8.10.0
 
 RUN mkdir -p /usr/src/garie-sentry-metrics
-RUN mkdir -p /usr/src/garie-sentry-metrics/reports
+RUN mkdir -p /usr/src/garie-sentry-metrics/data-logs
 
 WORKDIR /usr/src/garie-sentry-metrics
 
@@ -13,7 +13,7 @@ COPY . .
 
 EXPOSE 3000
 
-VOLUME ["/usr/src/garie-sentry-metrics/reports", "/usr/src/garie-lighthouse/logs"]
+VOLUME ["/usr/src/garie-sentry-metrics/data-logs", "/usr/src/garie-lighthouse/logs"]
 
 RUN chmod +x /usr/src/garie-sentry-metrics/docker-entrypoint.sh
 

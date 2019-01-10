@@ -1,5 +1,5 @@
 {
-	"cron": "0 */4 * * *",
+	"cron": "0 21 * * *",
 	"urls": [
         {
           "url": "https://www.eea.europa.eu/",

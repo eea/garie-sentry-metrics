@@ -29,6 +29,7 @@
         "influx": "^5.0.7",
         "request": "^2.88.0",
         "request-promise": "^4.2.2",
+        "fs-extra": "^7.0.0",
         "winston": "^3.0.0"
     },
     "devDependencies": {

@@ -1,3 +1,4 @@
+const fs = require('fs-extra');
 const logger = require('../utils/logger');
 const request = require('request-promise');
 
@@ -96,6 +97,24 @@ const getData = async (url, sentryId, matomoId) => {
                 tags: { url },
                 fields: { value: server_errors / nb_visits * 100, total_visits: nb_visits, sentry_events: server_errors }
             });
+
+
+            var urlNoProtocol = url.replace(/^https?\:\/\//i, "").replace("/", "");
+            var folder = '/usr/src/garie-sentry-metrics/data-logs/' + new Date().toLocaleDateString().split('/').join('-');
+            var sentry_file = folder + '/' + 'sentry-' + urlNoProtocol;
+            var matomo_file = folder + '/' + 'matomo-' + urlNoProtocol;
+
+            fs.outputJson(sentry_file, data_sentry)
+            .then(() => console.log(`Saved sentry data file for ${urlNoProtocol}`))
+            .catch(err => {
+              console.error(err)
+            })
+
+            fs.outputJson(matomo_file, data_matomo)
+            .then(() => console.log(`Saved matomo data file for ${urlNoProtocol}`))
+            .catch(err => {
+              console.error(err)
+            })
 
             resolve(total);
         } catch (err) {
