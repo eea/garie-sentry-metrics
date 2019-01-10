@@ -37,6 +37,7 @@ const getData = async (url, sentryId, matomoId) => {
                     }
                     if(dateReceived < last_date) {
                         finished_getting_sentry_data = true;
+                        return;
                     }
                 });
 
@@ -105,15 +106,15 @@ const getData = async (url, sentryId, matomoId) => {
             var matomo_file = folder + '/' + 'matomo-' + urlNoProtocol;
 
             fs.outputJson(sentry_file, data_sentry)
-            .then(() => console.log(`Saved sentry data file for ${urlNoProtocol}`))
+            .then(() => logger.info(`Saved sentry data file for ${urlNoProtocol}`))
             .catch(err => {
-              console.error(err)
+              logger.warn(err)
             })
 
             fs.outputJson(matomo_file, data_matomo)
-            .then(() => console.log(`Saved matomo data file for ${urlNoProtocol}`))
+            .then(() => logger.info(`Saved matomo data file for ${urlNoProtocol}`))
             .catch(err => {
-              console.error(err)
+              logger.warn(err)
             })
 
             resolve(total);
