@@ -1,6 +1,32 @@
 const fs = require('fs-extra');
+const path = require('path');
 const logger = require('../utils/logger');
 const request = require('request-promise');
+
+const urlParser = require('url');
+const crypto = require('crypto');
+const isEmpty = require('lodash.isempty');
+const dateFormat = require('dateformat');
+
+function pathNameFromUrl(url) {
+  const parsedUrl = urlParser.parse(url),
+    pathSegments = parsedUrl.pathname.split('/');
+  pathSegments.unshift(parsedUrl.hostname);
+
+  if (!isEmpty(parsedUrl.search)) {
+    const md5 = crypto.createHash('md5'),
+      hash = md5
+        .update(parsedUrl.search)
+        .digest('hex')
+        .substring(0, 8);
+    pathSegments.push('query-' + hash);
+  }
+  return pathSegments.filter(Boolean).join('-');
+}
+
+function reportDir(url) {
+    return path.join(__dirname, '../../reports/sentry-metrics-results', pathNameFromUrl(url));
+}
 
 const getData = async (url, sentryId, matomoId) => {
     return new Promise(async (resolve, reject) => {
@@ -101,9 +127,12 @@ const getData = async (url, sentryId, matomoId) => {
 
 
             var urlNoProtocol = url.replace(/^https?\:\/\//i, "").replace("/", "");
-            var folder = '/usr/src/garie-sentry-metrics/data-logs/' + new Date().toLocaleDateString().split('/').join('-');
-            var sentry_file = folder + '/' + 'sentry-' + urlNoProtocol;
-            var matomo_file = folder + '/' + 'matomo-' + urlNoProtocol;
+            var now = new Date();
+            var now_folder = dateFormat(now, "isoUtcDateTime");
+            var folder = reportDir(url) + "/" + now_folder;
+
+            var sentry_file = folder + '/' + 'sentry.json';
+            var matomo_file = folder + '/' + 'matomo.json';
 
             fs.outputJson(sentry_file, data_sentry)
             .then(() => logger.info(`Saved sentry data file for ${urlNoProtocol}`))

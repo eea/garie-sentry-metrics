@@ -30,7 +30,9 @@
         "request": "^2.88.0",
         "request-promise": "^4.2.2",
         "fs-extra": "^7.0.0",
-        "winston": "^3.0.0"
+        "winston": "^3.0.0",
+        "lodash.isempty": "4.4.0",
+        "dateformat": "*"
     },
     "devDependencies": {
         "codecov": "^3.0.0",
