@@ -31,20 +31,62 @@ function reportDir(url) {
 const getData = async (url, sentryId, matomoId) => {
     return new Promise(async (resolve, reject) => {
         try {
+            var isDebug = true;
             logger.info(`Getting sentry data for ${url}`);
 
-            var finished_getting_sentry_data = false;
-            var sentry_url = `${process.env.URL_SENTRY}api/0/projects/eea/${sentryId}/events/`;
-            var data_sentry = []
+            var finished_getting_sentry_events = false;
+            var finished_getting_sentry_issues = false;
+            var sentry_url_events = `${process.env.URL_SENTRY}api/0/projects/eea/${sentryId}/events/`;
+            var sentry_url_issues = `${process.env.URL_SENTRY}api/0/projects/eea/${sentryId}/issues/`;
+//TODO: remove hardcoded eea
+
+            var data_sentry = {jsEvents:[], serverEvents:[]};
             var yesterday_date = new Date();
             var last_date = new Date();
+            var sentry_issues = [];
 
             yesterday_date.setDate(yesterday_date.getDate() - 1);
             last_date.setDate(last_date.getDate() - 2);
 
-            while (!finished_getting_sentry_data) {
+            while (!finished_getting_sentry_issues) {
                 const data = await request({
-                    uri: sentry_url,
+                    uri: sentry_url_issues,
+                    json: true,
+                    resolveWithFullResponse: true,
+                    headers: {
+                        'Authorization': `Bearer ${process.env.SENTRY_AUTHORIZATION}`
+                    }
+                });
+
+                data.body.forEach(function(item, index) {
+                    var { lastSeen } = item;
+                    lastSeen = new Date(lastSeen);
+
+                    if (lastSeen >= last_date){
+                        sentry_issues.push(item.id);
+                    }
+                    if(lastSeen < last_date) {
+                        finished_getting_sentry_issues = true;
+                        return;
+                    }
+
+                });
+
+                var links = data.headers.link.split(',');
+                links.forEach(function(link) {
+                    if (link.indexOf('rel="next"') > -1 && link.indexOf('results="true"') > -1) {
+                        sentry_url_issues = link.substring(
+                            link.lastIndexOf("<") + 1,
+                            link.lastIndexOf(">")
+                        );
+                    }
+                });
+            }
+
+console.log(sentry_issues);
+            while (!finished_getting_sentry_events) {
+                const data = await request({
+                    uri: sentry_url_events,
                     json: true,
                     resolveWithFullResponse: true,
                     headers: {
@@ -54,15 +96,32 @@ const getData = async (url, sentryId, matomoId) => {
 
                 data.body.forEach(function(item, index) {
                     var { dateReceived } = item;
-                    dateReceived = new Date(dateReceived)
+                    dateReceived = new Date(dateReceived);
 
                     if (dateReceived.getDay() == yesterday_date.getDay() &&
                         dateReceived.getMonth() == yesterday_date.getMonth() &&
                         dateReceived.getYear() == yesterday_date.getYear()) {
-                            data_sentry.push(item);
+                            const { tags } = item;
+                            var shouldAdd = true;
+                            var slot = 'serverEvents';
+                            for (var i = 0; i < tags.length; i++){
+                                if ((tags[i].key === 'is') && (tags[i].value === 'unresolved')){
+                                    shouldAdd = true;
+                                }
+                                if ((tags[i].key === 'logger') && (tags[i].value === 'javascript')){
+                                    slot = 'jsEvents';
+                                }
+                            }
+                            if (shouldAdd){
+                                var tmp_env = {};
+                                if (isDebug){
+                                    tmp_env = item;
+                                }
+                                data_sentry[slot].push(item);
+                            }
                     }
                     if(dateReceived < last_date) {
-                        finished_getting_sentry_data = true;
+                        finished_getting_sentry_events = true;
                         return;
                     }
                 });
@@ -70,7 +129,7 @@ const getData = async (url, sentryId, matomoId) => {
                 var links = data.headers.link.split(',');
                 links.forEach(function(link) {
                     if (link.indexOf('rel="next"') > -1 && link.indexOf('results="true"') > -1) {
-                        sentry_url = link.substring(
+                        sentry_url_events = link.substring(
                             link.lastIndexOf("<") + 1,
                             link.lastIndexOf(">")
                         );
@@ -89,29 +148,10 @@ const getData = async (url, sentryId, matomoId) => {
             logger.info(`Successfull got matomo data for ${url}`);
 
 
-            var js_events = 0;
-            var server_errors = 0;
+            var js_events = data_sentry.jsEvents.length;
+            var server_errors = data_sentry.serverEvents.length;
             var total = [];
             const { nb_visits } = data_matomo;
-
-            data_sentry.forEach(function(item, index, array) {
-                const { tags } = array[index];
-                var isJsEvent = false;
-
-                Object.keys(tags).forEach(index_tags => {
-                    // Check if js event
-                    if (tags[index_tags]['key'] == "logger" && tags[index_tags]['value'] == "javascript") {
-                        isJsEvent = true;
-                    }
-                });
-
-                if (isJsEvent) {
-                    js_events++;
-                }
-                else {
-                    server_errors++;
-                }
-            });
 
             total.push({
                 measurement: 'JsEvents/TotalVisits',
@@ -134,8 +174,8 @@ const getData = async (url, sentryId, matomoId) => {
             var sentry_file = folder + '/' + 'sentry.json';
             var matomo_file = folder + '/' + 'matomo.json';
 
-            fs.outputJson(sentry_file, data_sentry)
-            .then(() => logger.info(`Saved sentry data file for ${urlNoProtocol}`))
+            fs.outputJson(sentry_file, data_sentry, {spaces: 4})
+            .then(() => logger.info(`1Saved sentry data file for ${urlNoProtocol}`))
             .catch(err => {
               logger.warn(err)
             })
