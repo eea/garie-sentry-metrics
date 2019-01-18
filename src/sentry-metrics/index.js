@@ -83,7 +83,6 @@ const getData = async (url, sentryId, matomoId) => {
                 });
             }
 
-console.log(sentry_issues);
             while (!finished_getting_sentry_events) {
                 const data = await request({
                     uri: sentry_url_events,
@@ -102,22 +101,20 @@ console.log(sentry_issues);
                         dateReceived.getMonth() == yesterday_date.getMonth() &&
                         dateReceived.getYear() == yesterday_date.getYear()) {
                             const { tags } = item;
+                            const { groupID } = item;
                             var shouldAdd = true;
                             var slot = 'serverEvents';
-                            for (var i = 0; i < tags.length; i++){
-                                if ((tags[i].key === 'is') && (tags[i].value === 'unresolved')){
-                                    shouldAdd = true;
+                            if ( sentry_issues.includes(groupID) ){
+                                for (var i = 0; i < tags.length; i++){
+                                    if ((tags[i].key === 'logger') && (tags[i].value === 'javascript')){
+                                        slot = 'jsEvents';
+                                    }
                                 }
-                                if ((tags[i].key === 'logger') && (tags[i].value === 'javascript')){
-                                    slot = 'jsEvents';
-                                }
-                            }
-                            if (shouldAdd){
                                 var tmp_env = {};
                                 if (isDebug){
                                     tmp_env = item;
                                 }
-                                data_sentry[slot].push(item);
+                                data_sentry[slot].push(tmp_env);
                             }
                     }
                     if(dateReceived < last_date) {
@@ -175,7 +172,7 @@ console.log(sentry_issues);
             var matomo_file = folder + '/' + 'matomo.json';
 
             fs.outputJson(sentry_file, data_sentry, {spaces: 4})
-            .then(() => logger.info(`1Saved sentry data file for ${urlNoProtocol}`))
+            .then(() => logger.info(`Saved sentry data file for ${urlNoProtocol}`))
             .catch(err => {
               logger.warn(err)
             })
