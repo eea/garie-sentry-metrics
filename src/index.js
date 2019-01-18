@@ -22,13 +22,14 @@ const getDataForAllUrls = async () => {
         const { url } = item;
         const { sentryId } = item;
         const { matomoId } = item;
+        const { organization } = item;
 
         if (!matomoId || !sentryId) {
             continue;
         }
 
         try {
-            const data = await getData(url, sentryId, matomoId);
+            const data = await getData(url, sentryId, matomoId, organization);
             await saveData(url, data);
         } catch (err) {
             logger.error(url, data);

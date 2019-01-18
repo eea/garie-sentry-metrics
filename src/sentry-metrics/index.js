@@ -28,7 +28,7 @@ function reportDir(url) {
     return path.join(__dirname, '../../reports/sentry-metrics-results', pathNameFromUrl(url));
 }
 
-const getData = async (url, sentryId, matomoId) => {
+const getData = async (url, sentryId, matomoId, organization) => {
     return new Promise(async (resolve, reject) => {
         try {
             var isDebug = false;
@@ -40,9 +40,8 @@ const getData = async (url, sentryId, matomoId) => {
 
             var finished_getting_sentry_events = false;
             var finished_getting_sentry_issues = false;
-            var sentry_url_events = `${process.env.URL_SENTRY}api/0/projects/eea/${sentryId}/events/`;
-            var sentry_url_issues = `${process.env.URL_SENTRY}api/0/projects/eea/${sentryId}/issues/`;
-//TODO: remove hardcoded eea
+            var sentry_url_events = `${process.env.URL_SENTRY}api/0/projects/${organization}/${sentryId}/events/`;
+            var sentry_url_issues = `${process.env.URL_SENTRY}api/0/projects/${organization}/${sentryId}/issues/`;
 
             var data_sentry = {jsEvents:[], serverEvents:[]};
             var yesterday_date = new Date();
