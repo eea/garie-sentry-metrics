@@ -31,7 +31,7 @@ function reportDir(url) {
 const getData = async (url, sentryId, matomoId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            var isDebug = true;
+            var isDebug = false;
             logger.info(`Getting sentry data for ${url}`);
 
             var finished_getting_sentry_events = false;
@@ -110,7 +110,12 @@ const getData = async (url, sentryId, matomoId) => {
                                         slot = 'jsEvents';
                                     }
                                 }
-                                var tmp_env = {};
+                                var tmp_env = {
+                                    eventID: item.eventID,
+                                    groupID: item.groupID,
+                                    id: item.id,
+                                    message: item.message
+                                };
                                 if (isDebug){
                                     tmp_env = item;
                                 }
