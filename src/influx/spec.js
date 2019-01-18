@@ -42,7 +42,7 @@ describe('influxdb', () => {
 
     describe('saveData', () => {
         it('writes influxdb points into the database for each property on a given object if it has values', async () => {
-            const result = await saveData('https://www.test.com', { firstname: 'bob', lastname: 'bob' });
+            const result = await saveData('https://www.test.com', [{ measurement:'firstname',tags:{"url":'https://www.test.com'}, fields:{value: 1.000000000, total_visits: 1, sentry_events: 1}}, { measurement:'lastname',tags:{"url":'https://www.test.com'}, fields:{value: 1.000000000, total_visits: 1, sentry_events: 1}}]);
 
             expect(influx.writePoints).toHaveBeenCalledWith([
                 {
@@ -70,27 +70,9 @@ describe('influxdb', () => {
             ]);
         });
 
-        it('does not write influxdb points into the database for any property that does not have a value', async () => {
-            await saveData('https://www.test.com', { firstname: 'bob', lastname: undefined });
-
-            expect(influx.writePoints).toBeCalledWith([
-                {
-                    measurement: 'firstname',
-                    tags: {
-                        url: 'https://www.test.com'
-                    },
-                    fields: {
-                        value: 1.0000000000,
-                        total_visits: 1,
-                        sentry_events: 1
-                    }
-                }
-            ]);
-        });
-
         it('rejects when writePoints fails to write into influxdb', async () => {
             influx.writePoints.mockRejectedValue();
-            await expect(saveData('https://www.test.co.uk', { firstname: 'bob', lastname: undefined })).rejects.toEqual('Failed to save data into influxdb for https://www.test.co.uk');
+            await expect(saveData('https://www.test.co.uk', { firstname: 'bob', lastname: undefined })).rejects.toEqual('Failed to save sentry data into influxdb for https://www.test.co.uk');
         });
     });
 });
