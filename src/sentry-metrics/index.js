@@ -32,6 +32,10 @@ const getData = async (url, sentryId, matomoId) => {
     return new Promise(async (resolve, reject) => {
         try {
             var isDebug = false;
+            var env_devel = process.env.DEVEL;
+            if (env_devel.trim() === "true"){
+                isDebug = true;
+            }
             logger.info(`Getting sentry data for ${url}`);
 
             var finished_getting_sentry_events = false;
