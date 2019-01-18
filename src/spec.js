@@ -14,7 +14,8 @@ jest.mock('./influx', () => {
 jest.mock('../config', () => {
     return {
         cron: '*/2 * * * *',
-        urls: [{ url: 'https://www.test.com' }]
+        urls: [{ url: 'https://www.test.com', 'sentryId': 'test_sentry_id', 'matomoId': 1, 'organization': 'test_org',
+}]
     };
 });
 
@@ -67,7 +68,7 @@ describe('main', () => {
 
         //Tidy this up?
         setTimeout(() => {
-            expect(sentryMetrics.getData).toHaveBeenCalledWith('https://www.test.com');
+            expect(sentryMetrics.getData).toHaveBeenCalledWith('https://www.test.com','test_sentry_id', 1, 'test_org');
             expect(influx.saveData).toHaveBeenCalled();
             done();
         }, 500);
