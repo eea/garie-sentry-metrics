@@ -32,8 +32,7 @@
         "fs-extra": "^7.0.0",
         "winston": "^3.0.0",
         "lodash.isempty": "4.4.0",
-        "dateformat": "*",
-        "mockserver": "*"
+        "dateformat": "*"
     },
     "devDependencies": {
         "codecov": "^3.0.0",
