@@ -23,7 +23,8 @@ const myGetData = async (item) => {
     const { url } = item.url_settings;
     return new Promise(async (resolve, reject) => {
         try {
-            const { organization } = item.url_settings;
+            var { organizationSlug } = item.url_settings;
+            var { sentrySlug } = item.url_settings;
             const { sentryId } = item.url_settings;
             const { matomoId } = item.url_settings;
             const { reportDir } = item;
@@ -36,10 +37,53 @@ const myGetData = async (item) => {
             }
             console.log(`Getting sentry data for ${url}`);
 
+            var finished_getting_sentry_projects = false;
             var finished_getting_sentry_events = false;
             var finished_getting_sentry_issues = false;
-            var sentry_url_events = `${process.env.URL_SENTRY}api/0/projects/${organization}/${sentryId}/events/`;
-            var sentry_url_issues = `${process.env.URL_SENTRY}api/0/projects/${organization}/${sentryId}/issues/`;
+            var sentry_url_projects = `${process.env.URL_SENTRY}api/0/projects/`;
+            var sentry_config = {};
+            while (true) {
+                const data = await request({
+                    uri: sentry_url_projects,
+                    json: true,
+                    resolveWithFullResponse: true,
+                    headers: {
+                        'Authorization': `Bearer ${process.env.SENTRY_AUTHORIZATION}`
+                    }
+                });
+                data.body.forEach(function(item, index) {
+                    const sentry_id = item.id;
+                    const sentry_slug = item.slug;
+                    const sentry_organization_slug = item.organization.slug;
+                    sentry_config[sentry_id] = {
+                        sentrySlug : sentry_slug,
+                        organizationSlug : sentry_organization_slug
+                    }
+                });
+                var links = data.headers.link.split(',');
+                links.forEach(function(link) {
+                    if (link.indexOf('rel="next"') > -1 && link.indexOf('results="true"') > -1) {
+                        sentry_url_projects = link.substring(
+                            link.lastIndexOf("<") + 1,
+                            link.lastIndexOf(">")
+                        );
+                    }
+                    else {
+                        finished_getting_sentry_projects = true;
+                    }
+                });
+                if (finished_getting_sentry_projects){
+                    break;
+                }
+            }
+
+            if (sentryId !== undefined){
+                sentrySlug = sentry_config[sentryId].sentrySlug;
+                organizationSlug = sentry_config[sentryId].organizationSlug;
+            }
+
+            var sentry_url_events = `${process.env.URL_SENTRY}api/0/projects/${organizationSlug}/${sentrySlug}/events/`;
+            var sentry_url_issues = `${process.env.URL_SENTRY}api/0/projects/${organizationSlug}/${sentrySlug}/issues/`;
 
             var data_sentry = {jsEvents:[], serverEvents:[]};
             var yesterday_date = new Date();

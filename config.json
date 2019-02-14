@@ -3,15 +3,14 @@
   "urls": [
     {
       "url": "https://www.eea.europa.eu/",
-      "sentryId": "www-eea-europa-eu",
-      "matomoId": 3,
-      "organization": "eea"
+      "sentryId": 2,
+      "matomoId": 3
     },
     {
       "url": "https://biodiversity.europa.eu/",
-      "sentryId": "www-eea-europa-eu",
+      "sentrySlug": "www-eea-europa-eu",
       "matomoId": 12,
-      "organization": "eea"
+      "organizationSlug": "eea"
     }
   ]
 }
