@@ -3,31 +3,35 @@ services:
     influxdb:
         image: 'influxdb:latest'
         ports:
-            - 8086:8086
+            - 8087:8086
         environment:
             - INFLUXDB_ADMIN_USER=admin
             - INFLUXDB_ADMIN_PASSWORD=admin
 
     garie-plugin:
-        image: 'eeacms/garie-sentry-metrics:latest'
+        build: .
         privileged: true
         volumes:
+            - ./src:/usr/src/garie-plugin/src:z
+            - ./config.json:/usr/src/garie-plugin/config.json:z
             - /var/run/docker.sock:/run/docker.sock
             - /usr/bin/docker:/bin/docker
         ports:
-            - 3000:3000
+            - 3001:3000
         environment:
             - HOST=influxdb
             - SENTRY_AUTHORIZATION=<SENTRY_AUTHORIZATION>
             - MATOMO_TOKEN=<MATOMO_TOKEN>
             - URL_MATOMO=<MATOMO_URL>
             - URL_SENTRY=<SENTRY_URL>
+            - DEVEL=true
         depends_on:
             - influxdb
+        command: bash -c "tail -f /dev/null"
 
     chronograf:
         image: 'chronograf:latest'
         ports:
-            - 8888:8888
+            - 8889:8888
         depends_on:
             - influxdb
