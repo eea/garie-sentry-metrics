@@ -3,7 +3,7 @@ services:
     influxdb:
         image: 'influxdb:latest'
         ports:
-            - 8087:8086
+            - 8086:8086
         environment:
             - INFLUXDB_ADMIN_USER=admin
             - INFLUXDB_ADMIN_PASSWORD=admin
@@ -17,7 +17,7 @@ services:
             - /var/run/docker.sock:/run/docker.sock
             - /usr/bin/docker:/bin/docker
         ports:
-            - 3001:3000
+            - 3000:3000
         environment:
             - HOST=influxdb
             - SENTRY_AUTHORIZATION=<SENTRY_AUTHORIZATION>
@@ -32,6 +32,6 @@ services:
     chronograf:
         image: 'chronograf:latest'
         ports:
-            - 8889:8888
+            - 8888:8888
         depends_on:
             - influxdb
