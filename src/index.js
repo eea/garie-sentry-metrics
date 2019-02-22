@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const serveIndex = require('serve-index');
 const request = require('request-promise');
 const fs = require('fs-extra');
-
+const sentry_api = require('./sentry');
 
 const myEmptyGetMeasurement = async (item, data) => {
     return new Promise(async (resolve, reject) => {
@@ -23,11 +23,10 @@ const myGetData = async (item) => {
     const { url } = item.url_settings;
     return new Promise(async (resolve, reject) => {
         try {
-            var { organizationSlug } = item.url_settings;
-            var { sentrySlug } = item.url_settings;
-            const { sentryId } = item.url_settings;
+
             const { matomoId } = item.url_settings;
             const { reportDir } = item;
+
             const reportFolder = garie_plugin.utils.helpers.reportDirNow(reportDir);
 
             var isDebug = false;
@@ -35,153 +34,42 @@ const myGetData = async (item) => {
             if ((env_devel !== undefined) && (env_devel.trim() === "true")){
                 isDebug = true;
             }
+            const sentry_base_url = `${process.env.URL_SENTRY}`;
+            const sentry_auth = `${process.env.SENTRY_AUTHORIZATION}`;
+
+            var sentry_projects = await sentry_api.sentry_projects(sentry_base_url, sentry_auth);
+
+            var period_from = new Date();
+            period_from.setDate(period_from.getDate() - 1);
+            period_from.setHours(0,0,0,0)
+            var period_to = new Date();
+            period_to.setDate(period_to.getDate());
+            period_to.setHours(0,0,0,0)
+
+            var {sentry_config} = item.url_settings;
+            var data_sentry = {"jsEvents":[], "serverEvents":[]};
             console.log(`Getting sentry data for ${url}`);
+            for (var i = 0; i < sentry_config.length; i++){
+                var { organizationSlug } = sentry_config[i];
+                var { sentrySlug } = sentry_config[i];
+                const { sentryId } = sentry_config[i];
 
-            var finished_getting_sentry_projects = false;
-            var finished_getting_sentry_events = false;
-            var finished_getting_sentry_issues = false;
-            var sentry_url_projects = `${process.env.URL_SENTRY}api/0/projects/`;
-            var sentry_config = {};
-            while (true) {
-                const data = await request({
-                    uri: sentry_url_projects,
-                    json: true,
-                    resolveWithFullResponse: true,
-                    headers: {
-                        'Authorization': `Bearer ${process.env.SENTRY_AUTHORIZATION}`
-                    }
-                });
-                data.body.forEach(function(item, index) {
-                    const sentry_id = item.id;
-                    const sentry_slug = item.slug;
-                    const sentry_organization_slug = item.organization.slug;
-                    sentry_config[sentry_id] = {
-                        sentrySlug : sentry_slug,
-                        organizationSlug : sentry_organization_slug
-                    }
-                });
-                var links = data.headers.link.split(',');
-                links.forEach(function(link) {
-                    if (link.indexOf('rel="next"') > -1 && link.indexOf('results="true"') > -1) {
-                        sentry_url_projects = link.substring(
-                            link.lastIndexOf("<") + 1,
-                            link.lastIndexOf(">")
-                        );
-                    }
-                    else {
-                        finished_getting_sentry_projects = true;
-                    }
-                });
-                if (finished_getting_sentry_projects){
-                    break;
+
+                if (sentryId !== undefined){
+                    sentrySlug = sentry_projects[sentryId].sentrySlug;
+                    organizationSlug = sentry_projects[sentryId].organizationSlug;
                 }
-            }
 
-            if (sentryId !== undefined){
-                sentrySlug = sentry_config[sentryId].sentrySlug;
-                organizationSlug = sentry_config[sentryId].organizationSlug;
-            }
+                const sentry_issues = await sentry_api.sentry_issues(sentry_base_url, sentry_auth, organizationSlug, sentrySlug, period_from);
 
-            var sentry_url_events = `${process.env.URL_SENTRY}api/0/projects/${organizationSlug}/${sentrySlug}/events/`;
-            var sentry_url_issues = `${process.env.URL_SENTRY}api/0/projects/${organizationSlug}/${sentrySlug}/issues/`;
+                const data_sentry_tmp = await sentry_api.sentry_events(sentry_base_url, sentry_auth, organizationSlug, sentrySlug, period_from, period_to, sentry_issues);
 
-            var data_sentry = {jsEvents:[], serverEvents:[]};
-            var yesterday_date = new Date();
-            var last_date = new Date();
-            var sentry_issues = [];
-
-            yesterday_date.setDate(yesterday_date.getDate() - 1);
-            last_date.setDate(last_date.getDate() - 2);
-
-            while (!finished_getting_sentry_issues) {
-                const data = await request({
-                    uri: sentry_url_issues,
-                    json: true,
-                    resolveWithFullResponse: true,
-                    headers: {
-                        'Authorization': `Bearer ${process.env.SENTRY_AUTHORIZATION}`
-                    }
-                });
-                data.body.forEach(function(item, index) {
-                    var { lastSeen } = item;
-                    lastSeen = new Date(lastSeen);
-
-                    if (lastSeen >= last_date){
-                        sentry_issues.push(item.id);
-                    }
-                    if(lastSeen < last_date) {
-                        finished_getting_sentry_issues = true;
-                        return;
-                    }
-
-                });
-                var links = data.headers.link.split(',');
-                links.forEach(function(link) {
-                    if (link.indexOf('rel="next"') > -1 && link.indexOf('results="true"') > -1) {
-                        sentry_url_issues = link.substring(
-                            link.lastIndexOf("<") + 1,
-                            link.lastIndexOf(">")
-                        );
-                    }
-                });
-            }
-            while (!finished_getting_sentry_events) {
-                const data = await request({
-                    uri: sentry_url_events,
-                    json: true,
-                    resolveWithFullResponse: true,
-                    headers: {
-                        'Authorization': `Bearer ${process.env.SENTRY_AUTHORIZATION}`
-                    }
-                });
-
-                data.body.forEach(function(item, index) {
-                    var { dateReceived } = item;
-                    dateReceived = new Date(dateReceived);
-
-                    if (dateReceived.getDay() == yesterday_date.getDay() &&
-                        dateReceived.getMonth() == yesterday_date.getMonth() &&
-                        dateReceived.getYear() == yesterday_date.getYear()) {
-                            const { tags } = item;
-                            const { groupID } = item;
-                            var shouldAdd = true;
-                            var slot = 'serverEvents';
-                            if ( sentry_issues.includes(groupID) ){
-                                for (var i = 0; i < tags.length; i++){
-                                    if ((tags[i].key === 'logger') && (tags[i].value === 'javascript')){
-                                        slot = 'jsEvents';
-                                    }
-                                }
-                                var tmp_env = {
-                                    eventID: item.eventID,
-                                    groupID: item.groupID,
-                                    id: item.id,
-                                    message: item.message
-                                };
-                                if (isDebug){
-                                    tmp_env = item;
-                                }
-                                data_sentry[slot].push(tmp_env);
-                            }
-                    }
-                    if(dateReceived < last_date) {
-                        finished_getting_sentry_events = true;
-                        return;
-                    }
-                });
-
-                var links = data.headers.link.split(',');
-                links.forEach(function(link) {
-                    if (link.indexOf('rel="next"') > -1 && link.indexOf('results="true"') > -1) {
-                        sentry_url_events = link.substring(
-                            link.lastIndexOf("<") + 1,
-                            link.lastIndexOf(">")
-                        );
-                    }
-                });
+                data_sentry['jsEvents'] = data_sentry['jsEvents'].concat(data_sentry_tmp['jsEvents']);
+                data_sentry['serverEvents'] = data_sentry['serverEvents'].concat(data_sentry_tmp['serverEvents']);
             }
             console.log(`Successfull got sentry data for ${url}`);
-
+            var js_events = data_sentry.jsEvents.length;
+            var server_errors = data_sentry.serverEvents.length;
 
             console.log(`Getting matomo data for ${url}`);
 
@@ -192,8 +80,6 @@ const myGetData = async (item) => {
             console.log(`Successfull got matomo data for ${url}`);
 
 
-            var js_events = data_sentry.jsEvents.length;
-            var server_errors = data_sentry.serverEvents.length;
             var total = [];
             const { nb_visits } = data_matomo;
 
@@ -213,6 +99,28 @@ const myGetData = async (item) => {
             var sentry_file = path.join(reportFolder, 'sentry.json');
             var matomo_file = path.join(reportFolder, 'matomo.json');
 
+            if (!isDebug){
+                var data_sentry_prod = {"jsEvents":[], "serverEvents":[]};
+                data_sentry['jsEvents'].forEach(function(item){
+                    var tmp_item = {
+                        eventID: item.eventID,
+                        groupID: item.groupID,
+                        id: item.id,
+                        message: item.message
+                    };
+                    data_sentry_prod['jsEvents'].push(tmp_item);
+                });
+                data_sentry['serverEvents'].forEach(function(item){
+                    var tmp_item = {
+                        eventID: item.eventID,
+                        groupID: item.groupID,
+                        id: item.id,
+                        message: item.message
+                    };
+                    data_sentry_prod['serverEvents'].push(tmp_item);
+                });
+                data_sentry = data_sentry_prod;
+            }
             fs.outputJson(sentry_file, data_sentry, {spaces: 2})
             .then(() => console.log(`Saved sentry data file for ${url}`))
             .catch(err => {
@@ -244,10 +152,11 @@ app.use('/reports', express.static('reports'), serveIndex('reports', { icons: tr
 
 const main = async () => {
   garie_plugin.init({
-    database:'sentry-metrics',
+    db_name:'sentry-metrics',
     getData:myGetData,
     getMeasurement:myEmptyGetMeasurement,
-    app_name:'sentry-metrics-results',
+    plugin_name:'sentry-metrics',
+    report_folder_name:'sentry-metrics-results',
     app_root: path.join(__dirname, '..'),
     config:config
   });

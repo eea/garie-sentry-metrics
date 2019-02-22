@@ -1,16 +1,23 @@
 {
+  "plugins":{
+        "sentry-metrics":{
+            "cron": "0 */4 * * *"
+        }
+    },
   "cron": "0 */4 * * *",
   "urls": [
     {
       "url": "https://www.eea.europa.eu/",
-      "sentryId": 2,
-      "matomoId": 3
-    },
-    {
-      "url": "https://biodiversity.europa.eu/",
-      "sentrySlug": "www-eea-europa-eu",
-      "matomoId": 12,
-      "organizationSlug": "eea"
+      "plugins": {
+        "sentry-metrics":{
+          "sentry_config": [
+            {
+              "sentryId": 2
+            }
+          ],
+          "matomoId": 3
+        }
+      }
     }
   ]
 }
