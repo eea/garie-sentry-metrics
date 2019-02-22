@@ -7,15 +7,105 @@
   "cron": "0 */4 * * *",
   "urls": [
     {
-      "url": "https://www.eea.europa.eu/",
+      "url": "test1",
       "plugins": {
         "sentry-metrics":{
           "sentry_config": [
             {
-              "sentryId": 2
+              "sentryId": 23
             }
           ],
-          "matomoId": 3
+          "matomoId": 12
+        }
+      }
+    },
+    {
+      "url": "test2",
+      "plugins": {
+        "sentry-metrics":{
+          "sentry_config": [
+            {
+              "sentryId": 23,
+              "filters":{
+                "jsEvents":{
+                        "operator":"equals", "field":"tags.app_name", "value":"global-search"
+                }
+              }
+            }
+          ],
+          "matomoId": 12
+        }
+      }
+    },
+    {
+      "url": "test3",
+      "plugins": {
+        "sentry-metrics":{
+          "sentry_config": [
+            {
+              "sentryId": 23,
+              "filters":{
+                "jsEvents":{
+                        "operator":"equals", "field":"tags.app_name", "value":"CaR"
+                }
+              }
+            }
+          ],
+          "matomoId": 12
+        }
+      }
+    },
+    {
+      "url": "test4",
+      "plugins": {
+        "sentry-metrics":{
+          "sentry_config": [
+            {
+              "sentryId": 23,
+              "filters":{
+                "jsEvents":{
+                        "operator":"or", "operands":[{"operator":"equals", "field":"tags.app_name", "value":"global-search"}, {"operator":"equals", "field":"tags.app_name", "value":"CaR"}]
+                }
+              }
+            }
+          ],
+          "matomoId": 12
+        }
+      }
+    },
+    {
+      "url": "test5",
+      "plugins": {
+        "sentry-metrics":{
+          "sentry_config": [
+            {
+              "sentryId": 23,
+              "filters":{
+                "jsEvents":{
+                        "operator":"not", "operand":{"operator":"or", "operands":[{"operator":"equals", "field":"tags.app_name", "value":"global-search"}, {"operator":"equals", "field":"tags.app_name", "value":"CaR"}]}
+                }
+              }
+            }
+          ],
+          "matomoId": 12
+        }
+      }
+    },
+    {
+      "url": "test6",
+      "plugins": {
+        "sentry-metrics":{
+          "sentry_config": [
+            {
+              "sentryId": 23,
+              "filters":{
+                "jsEvents":{
+                        "operator":"not", "operand":{"operator":"equals", "field":"tags.app_name", "value":"global-search"}
+                }
+              }
+            }
+          ],
+          "matomoId": 12
         }
       }
     }

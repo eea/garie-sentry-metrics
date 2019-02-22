@@ -7,6 +7,7 @@ const serveIndex = require('serve-index');
 const request = require('request-promise');
 const fs = require('fs-extra');
 const sentry_api = require('./sentry');
+const filtering = require('./filtering');
 
 const myEmptyGetMeasurement = async (item, data) => {
     return new Promise(async (resolve, reject) => {
@@ -23,7 +24,6 @@ const myGetData = async (item) => {
     const { url } = item.url_settings;
     return new Promise(async (resolve, reject) => {
         try {
-
             const { matomoId } = item.url_settings;
             const { reportDir } = item;
 
@@ -53,7 +53,7 @@ const myGetData = async (item) => {
                 var { organizationSlug } = sentry_config[i];
                 var { sentrySlug } = sentry_config[i];
                 const { sentryId } = sentry_config[i];
-
+                const { filters } = sentry_config[i];
 
                 if (sentryId !== undefined){
                     sentrySlug = sentry_projects[sentryId].sentrySlug;
@@ -66,6 +66,34 @@ const myGetData = async (item) => {
 
                 data_sentry['jsEvents'] = data_sentry['jsEvents'].concat(data_sentry_tmp['jsEvents']);
                 data_sentry['serverEvents'] = data_sentry['serverEvents'].concat(data_sentry_tmp['serverEvents']);
+
+                filtered_data_sentry = {"jsEvents":[], "serverEvents":[]};
+                if (filters !== undefined){
+                    if (filters['jsEvents'] !== undefined){
+                        data_sentry['jsEvents'].forEach(function(item){
+                            item.tags_obj = {tags:{}};
+                            item.tags.forEach(function(tag_val){
+                                item.tags_obj.tags[tag_val.key] = tag_val.value;
+                            });
+                            if(filtering.parseExpr(filters['jsEvents'], item)){
+                                filtered_data_sentry['jsEvents'].push(item);
+                            }
+                        });
+                        data_sentry['jsEvents'] = filtered_data_sentry['jsEvents']
+                    }
+                    if (filters['serverEvents'] !== undefined){
+                        data_sentry['serverEvents'].forEach(function(item){
+                            item.tags_obj = {tags:{}};
+                            item.tags.forEach(function(tag_val){
+                                item.tags_obj.tags[tag_val.key] = tag_val.value;
+                            });
+                            if(filtering.parseExpr(filters['serverEvents'], item)){
+                                filtered_data_sentry['serverEvents'].push(item);
+                            }
+                        });
+                        data_sentry['serverEvents'] = filtered_data_sentry['serverEvents']
+                    }
+                }
             }
             console.log(`Successfull got sentry data for ${url}`);
             var js_events = data_sentry.jsEvents.length;
@@ -98,6 +126,8 @@ const myGetData = async (item) => {
 
             var sentry_file = path.join(reportFolder, 'sentry.json');
             var matomo_file = path.join(reportFolder, 'matomo.json');
+
+            
 
             if (!isDebug){
                 var data_sentry_prod = {"jsEvents":[], "serverEvents":[]};
