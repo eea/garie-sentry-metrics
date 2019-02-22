@@ -25,6 +25,19 @@ const myGetData = async (item) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { matomoId } = item.url_settings;
+            if (matomoId === undefined){
+                const exception = `Missing matomo id for ${url}`
+                console.log(exception);
+                reject(exception);
+                return;
+            }
+            var {sentry_config} = item.url_settings;
+            if (sentry_config === undefined){
+                const exception = `Missing sentry config for ${url}`
+                console.log(exception);
+                reject(exception);
+                return;
+            }
             const { reportDir } = item;
 
             const reportFolder = garie_plugin.utils.helpers.reportDirNow(reportDir);
@@ -46,7 +59,6 @@ const myGetData = async (item) => {
             period_to.setDate(period_to.getDate());
             period_to.setHours(0,0,0,0)
 
-            var {sentry_config} = item.url_settings;
             var data_sentry = {"jsEvents":[], "serverEvents":[]};
             console.log(`Getting sentry data for ${url}`);
             for (var i = 0; i < sentry_config.length; i++){
@@ -111,23 +123,29 @@ const myGetData = async (item) => {
             var total = [];
             const { nb_visits } = data_matomo;
 
+            if (nb_visits === undefined){
+            }
+            var js_val = 0;
+            var server_val = 0;
+            if (nb_visits != 0){
+                js_val = js_events / nb_visits * 100;
+                server_val = server_errors / nb_visits * 100
+            }
             total.push({
                 measurement: 'JsEvents/TotalVisits',
                 tags: { url },
-                fields: { value: js_events / nb_visits * 100, total_visits: nb_visits, sentry_events: js_events }
+                fields: { value: js_val, total_visits: nb_visits, sentry_events: js_events }
             });
 
             total.push({
                 measurement: 'ServerErrors/TotalVisits',
                 tags: { url },
-                fields: { value: server_errors / nb_visits * 100, total_visits: nb_visits, sentry_events: server_errors }
+                fields: { value: server_val, total_visits: nb_visits, sentry_events: server_errors }
             });
 
 
             var sentry_file = path.join(reportFolder, 'sentry.json');
             var matomo_file = path.join(reportFolder, 'matomo.json');
-
-            
 
             if (!isDebug){
                 var data_sentry_prod = {"jsEvents":[], "serverEvents":[]};
