@@ -123,10 +123,8 @@ const myGetData = async (item) => {
             var total = [];
             const { nb_visits } = data_matomo;
 
-            if (nb_visits === undefined){
-            }
-            var js_val = 0;
-            var server_val = 0;
+            var js_val = 100;
+            var server_val = 100;
             if (nb_visits != 0){
                 js_val = js_events / nb_visits * 100;
                 server_val = server_errors / nb_visits * 100
