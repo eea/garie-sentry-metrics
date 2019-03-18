@@ -126,8 +126,8 @@ const myGetData = async (item) => {
             var js_val = 100;
             var server_val = 100;
             if (nb_visits != 0){
-                js_val = 100 - js_events / nb_visits * 100;
-                server_val = 100 - server_errors / nb_visits * 100
+                js_val = Math.max(100 - js_events / nb_visits * 100, 0);
+                server_val = Math.max(100 - server_errors / nb_visits * 100, 0);
             }
             total.push({
                 measurement: 'JsEvents/TotalVisits',
