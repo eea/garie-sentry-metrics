@@ -1,6 +1,6 @@
 {
     "name": "garie-sentry-metrics",
-    "version": "0.0.1",
+    "version": "1.0.1",
     "description": "Garie Plugin for sentry and matomo metrics",
     "engines": {
         "node": ">=6"
@@ -11,7 +11,7 @@
         "start": "node ./src/index.js"
     },
     "dependencies": {
-        "garie-plugin": "https://github.com/eea/garie-plugin#0.0.7",
+        "garie-plugin": "https://github.com/eea/garie-plugin#0.0.11",
         "request-promise": "^4.2.2"
     },
     "devDependencies": {

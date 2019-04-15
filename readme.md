@@ -170,7 +170,11 @@ On start garie-uptimerobot will start to gather statistics for the websites adde
 
 | Property | Type                | Description                                                                          |
 | -------- | ------------------- | ------------------------------------------------------------------------------------ |
-| `cron`   | `string` (optional) | Cron timer. Supports syntax can be found [here].(https://www.npmjs.com/package/cron) |
+| `plugins.sentry-metrics.cron`   | `string` (optional) | Cron timer. Supports syntax can be found [here].(https://www.npmjs.com/package/cron) |
+| `plugins.sentry-metrics.retry`   | `object` (optional) | Configuration how to retry the failed tasks |
+| `plugins.sentry-metrics.retry.after`   | `number` (optional, default 30) | Minutes before we retry to execute the tasks |
+| `plugins.sentry-metrics.retry.times`   | `number` (optional, default 3) | How many time to retry to execute the failed tasks |
+| `plugins.sentry-metrics.retry.timeRange`   | `number` (optional, default 360) | Period in minutes to be checked in influx, to know if a task failed |
 | `urls`   | `object` (required) | Config for sentrymetrics. More detail below                                          |
 
 **urls object**

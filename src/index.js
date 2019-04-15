@@ -28,14 +28,14 @@ const myGetData = async (item) => {
             if (matomoId === undefined){
                 const exception = `Missing matomo id for ${url}`
                 console.log(exception);
-                reject(exception);
+                resolve(null);
                 return;
             }
             var {sentry_config} = item.url_settings;
             if (sentry_config === undefined){
                 const exception = `Missing sentry config for ${url}`
                 console.log(exception);
-                reject(exception);
+                resolve(null);
                 return;
             }
             const { reportDir } = item;
