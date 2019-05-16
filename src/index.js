@@ -25,11 +25,18 @@ const myGetData = async (item) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { matomoId } = item.url_settings;
+            var default_visits_per_day;
             if (matomoId === undefined){
+                default_visits_per_day = item.url_settings.default_visits_per_day;
                 const exception = `Missing matomo id for ${url}`
                 console.log(exception);
-                resolve(null);
-                return;
+                if ( default_visits_per_day === undefined ){
+                    resolve(null);
+                    return;
+                }
+                else {
+                    console.log(`Using 'default_visitis_per_day' from configuration`)
+                }
             }
             var {sentry_config} = item.url_settings;
             if (sentry_config === undefined){
@@ -111,18 +118,30 @@ const myGetData = async (item) => {
             var js_events = data_sentry.jsEvents.length;
             var server_errors = data_sentry.serverEvents.length;
 
-            console.log(`Getting matomo data for ${url}`);
+            var nb_visits;
+            if (matomoId !== undefined) {
+                console.log(`Getting matomo data for ${url}`);
 
-            const data_matomo = await request({
-                uri: `${process.env.URL_MATOMO}index.php?module=API&method=VisitsSummary.get&idSite=${matomoId}&period=day&date=yesterday&format=JSON&token_auth=${process.env.MATOMO_TOKEN}`,
-                json: true
-            });
-            console.log(`Successfull got matomo data for ${url}`);
+                const data_matomo = await request({
+                    uri: `${process.env.URL_MATOMO}index.php?module=API&method=VisitsSummary.get&idSite=${matomoId}&period=day&date=yesterday&format=JSON&token_auth=${process.env.MATOMO_TOKEN}`,
+                    json: true
+                });
+                console.log(`Successfull got matomo data for ${url}`);
 
 
+                nb_visits = data_matomo.nb_visits;
+
+                var matomo_file = path.join(reportFolder, 'matomo.json');
+                fs.outputJson(matomo_file, data_matomo, {spaces: 2})
+                .then(() => console.log(`Saved matomo data file for ${url}`))
+                .catch(err => {
+                  console.log(err)
+                })
+            }
+            else {
+                nb_visits = default_visits_per_day;
+            }
             var total = [];
-            const { nb_visits } = data_matomo;
-
             var js_val = 100;
             var server_val = 100;
             if (nb_visits != 0){
@@ -143,7 +162,6 @@ const myGetData = async (item) => {
 
 
             var sentry_file = path.join(reportFolder, 'sentry.json');
-            var matomo_file = path.join(reportFolder, 'matomo.json');
 
             if (!isDebug){
                 var data_sentry_prod = {"jsEvents":[], "serverEvents":[]};
@@ -169,12 +187,6 @@ const myGetData = async (item) => {
             }
             fs.outputJson(sentry_file, data_sentry, {spaces: 2})
             .then(() => console.log(`Saved sentry data file for ${url}`))
-            .catch(err => {
-              console.log(err)
-            })
-
-            fs.outputJson(matomo_file, data_matomo, {spaces: 2})
-            .then(() => console.log(`Saved matomo data file for ${url}`))
             .catch(err => {
               console.log(err)
             })

@@ -184,7 +184,8 @@ On start garie-uptimerobot will start to gather statistics for the websites adde
 | `url`                                                          | `string` (required)  | Url to get uptimerobot metrics for.                                                  |
 | `plugins`                                                      | `object` (optional)  | To setup custom configurations.                                                      |
 | `plugins.sentry-metrics`                                       | `object` (required)  | To setup custom sentry-metrics config.                                               |
-| `plugins.sentry-metrics.matomoId`                              | `number` (required)  | Matomo project Id                                                                    |
+| `plugins.sentry-metrics.matomoId`                              | `number` (optional)  | Matomo project Id                                                                    |
+| `plugins.sentry-metrics.default_visits_per_day`                | `number` (optional)  | If Matomo project Id is missing, you can specify a default value for number of visits|
 | `plugins.sentry-metrics.sentry_config`                         | `list` (required)    | List of sentry configurations                                                        |
 | `plugins.sentry-metrics.sentry_config[n].sentryId`             | `number` (optional)  | Unique sentry id. If not specified, *organizationSlug* and *sentrySlug* are required |
 | `plugins.sentry-metrics.sentry_config[n].organizationSlug`     | `string` (optional)  | sentry organization name                                                             |
