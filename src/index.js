@@ -8,6 +8,7 @@ const request = require('request-promise');
 const fs = require('fs-extra');
 const sentry_api = require('./sentry');
 const filtering = require('./filtering');
+const intervals = require('./intervals');
 
 const myEmptyGetMeasurement = async (item, data) => {
     return new Promise(async (resolve, reject) => {
@@ -190,6 +191,9 @@ const myGetData = async (item) => {
             .catch(err => {
               console.log(err)
             })
+            if (config.plugins['sentry-metrics'].intervals !== undefined){
+                total = await intervals.updateWithIntervals(config.plugins['sentry-metrics'].intervals, item.influx, total);
+            }
 
             resolve(total);
 
