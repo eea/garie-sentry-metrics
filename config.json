@@ -1,7 +1,11 @@
 {
   "plugins":{
         "sentry-metrics":{
-            "cron": "0 */4 * * *"
+            "cron": "0 */4 * * *",
+            "intervals": [
+                "field": "30days",
+                "days": 30
+            ]
         }
     },
   "cron": "0 */4 * * *",
