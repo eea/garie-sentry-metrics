@@ -1,3 +1,4 @@
+
 # Garie sentry-metrics plugin
 
 <p align="center">
@@ -44,7 +45,13 @@ Next setup you're config. Edit the `config.json` and add websites to the list.
 {
   "plugins":{
         "sentry-metrics":{
-            "cron": "0 */4 * * *"
+            "cron": "0 */4 * * *",
+            "intervals": [
+                {
+                    "field": "30days",
+                    "days": 30
+                }
+            ]
         }
     },
   "cron": "0 */4 * * *",
@@ -175,6 +182,10 @@ On start garie-uptimerobot will start to gather statistics for the websites adde
 | `plugins.sentry-metrics.retry.after`   | `number` (optional, default 30) | Minutes before we retry to execute the tasks |
 | `plugins.sentry-metrics.retry.times`   | `number` (optional, default 3) | How many time to retry to execute the failed tasks |
 | `plugins.sentry-metrics.retry.timeRange`   | `number` (optional, default 360) | Period in minutes to be checked in influx, to know if a task failed |
+| `plugins.sentry-metrics.intervals`   | `list` (optional) | A list of intervals to aggregate sentry and matomo statistics |
+| `plugins.sentry-metrics.intervals[i]`   | `object` | Aggregation interval configuration |
+| `plugins.sentry-metrics.intervals[i].field`   | `string` | Field name where the aggregation will be stored in influx |
+| `plugins.sentry-metrics.intervals[i].days`   | `number` | Number of days for the aggregation |
 | `urls`   | `object` (required) | Config for sentrymetrics. More detail below                                          |
 
 **urls object**
@@ -194,6 +205,44 @@ On start garie-uptimerobot will start to gather statistics for the websites adde
 | `plugins.sentry-metrics.sentry_config[n].filters.jsEvents`     | `json` (optional)    | Describe filters for js events                                                       |
 | `plugins.sentry-metrics.sentry_config[n].filters.serverEvents` | `json` (optional)    | Describe filters for server events                                                   |
 
+### Configuring the intervals
+In the measurement you can store an aggregation of previous results.
+For this you have to use the **intervals** property in the plugin configuration:
+```javascript
+"sentry-metrics":{
+    "cron": "0 */4 * * *",
+    "intervals": [
+        {
+            "field": "30days",
+            "days": 30
+        }
+    ]
+}
+```
+It's possible to configure more intervals, ex. for 7days, 30 days:
+```javascript
+"sentry-metrics":{
+    "cron": "0 */4 * * *",
+    "intervals": [
+        {
+            "field": "30days",
+            "days": 30
+        },
+        {
+            "field": "7days",
+            "days": 7
+        }
+    ]
+}
+```
+If the **intervals** property is missing, a default configuration will be used, for 30 days.
+If you want to entirely disable this feature, you have to set the intervals to an empty list:
+```javascript
+"sentry-metrics":{
+    "cron": "0 */4 * * *",
+    "intervals": []
+}
+```
 
 ### Configuring the filters
 For configuring the filters we have to build a json object
