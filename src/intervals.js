@@ -13,15 +13,15 @@ const updateWithInterval = async(interval, influx, result) => {
                                 GROUP by time(1d)
                                 ORDER by time desc
                                 limit ${interval.days})
-                            order by time desc`
-//TODO: update query to skip 'today', we already have it in the result and if the query is executed more than once in the same day, we will count the values twice
+                            where time < now() - 1d
+                            order by time desc`;
                 const prev_results = await influx.query(query);
                 var visits = 0
                 var events = 0
 
                 if (prev_results.groupRows[0] !== undefined){
-                    const visits = prev_results.groupRows[0].rows[0].sum_total_visits;
-                    const events = prev_results.groupRows[0].rows[0].sum_sentry_events;
+                    visits = prev_results.groupRows[0].rows[0].sum_total_visits;
+                    events = prev_results.groupRows[0].rows[0].sum_sentry_events;
                 }
                 visits += result[i].fields.total_visits;
                 events += result[i].fields.sentry_events;
