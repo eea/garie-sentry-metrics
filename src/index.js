@@ -191,9 +191,11 @@ const myGetData = async (item) => {
             .catch(err => {
               console.log(err)
             })
-            if (config.plugins['sentry-metrics'].intervals !== undefined){
-                total = await intervals.updateWithIntervals(config.plugins['sentry-metrics'].intervals, item.influx, total);
+            var sentry_intervals = config.plugins['sentry-metrics'].intervals
+            if (sentry_intervals === undefined){
+                sentry_intervals = [{"field":"30days", "days":30}];
             }
+            total = await intervals.updateWithIntervals(sentry_intervals, item.influx, total);
 
             resolve(total);
 
