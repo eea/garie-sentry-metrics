@@ -11,9 +11,8 @@ const updateWithInterval = async(interval, influx, result) => {
                                 from "${measurement.measurement}"
                                 where url = '${measurement.tags.url}'
                                 GROUP by time(1d)
-                                ORDER by time desc
-                                limit ${interval.days})
-                            where time < now() - 1d
+                                ORDER by time desc)
+                            where time < now() - 1d and time > now() - ${interval.days}d
                             order by time desc`;
                 const prev_results = await influx.query(query);
                 var visits = 0
