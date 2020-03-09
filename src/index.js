@@ -1,9 +1,6 @@
 const garie_plugin = require('garie-plugin')
 const path = require('path');
 const config = require('../config');
-const express = require('express');
-const bodyParser = require('body-parser');
-const serveIndex = require('serve-index');
 const request = require('request-promise');
 const fs = require('fs-extra');
 const sentry_api = require('./sentry');
@@ -210,38 +207,27 @@ const myGetData = async (item) => {
 
 console.log("Start");
 
-
-const app = express();
-app.use('/reports', express.static('reports'), serveIndex('reports', { icons: true }));
-
 const main = async () => {
-  return new Promise(async (resolve, reject) => {
-    try{
-      await garie_plugin.init({
-        db_name:'sentry-metrics',
-        getData:myGetData,
-        getMeasurement:myEmptyGetMeasurement,
-        plugin_name:'sentry-metrics',
-        report_folder_name:'sentry-metrics-results',
-        app_root: path.join(__dirname, '..'),
-        config:config
-      });
-    }
-    catch(err){
-      reject(err);
-    }
-  });
+  try{
+    const { app } = await garie_plugin.init({
+      db_name:'sentry-metrics',
+      getData:myGetData,
+      getMeasurement:myEmptyGetMeasurement,
+      plugin_name:'sentry-metrics',
+      report_folder_name:'sentry-metrics-results',
+      app_root: path.join(__dirname, '..'),
+      config:config,
+      onDemand: true
+    });
+    app.listen(3000, () => {
+      console.log('Application listening on port 3000');
+    });
+  }
+  catch(err){
+    console.log(err);
+  }
 }
 
 if (process.env.ENV !== 'test') {
-  const server = app.listen(3000, async () => {
-    console.log('Application listening on port 3000');
-    try{
-      await main();
-    }
-    catch(err){
-      console.log(err);
-      server.close();
-    }
-  });
+  main();
 }
