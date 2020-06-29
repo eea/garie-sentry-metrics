@@ -12,7 +12,6 @@ function parseExpr(tree, item){
             field_val = item[tree.field];
         }
         if (field_val === undefined){
-            console.log("Failed to get attribute:",tree.field, "for filter", tree, "on event", item.id)
             return false;
         }
         if (tree.operator === 'equals'){
