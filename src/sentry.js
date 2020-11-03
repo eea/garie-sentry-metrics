@@ -128,6 +128,11 @@ function handle_events(item, options){
 
         const { groupID } = item;
         if (issues.includes(groupID)){
+            deleteKeys = ['entries'];
+            deleteKeys.forEach(function(key){
+                // Remove huge key/value pairs that are not used
+                delete item[key];
+            });
             value.value = item;
         }
         else {
