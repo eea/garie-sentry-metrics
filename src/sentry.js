@@ -118,6 +118,7 @@ function handle_events(item, options){
     const { period_from } = options;
     const { period_to } = options;
     const { issues } = options;
+    const { remove_fields } = options;
 
     var { dateReceived } = item;
     dateReceived = new Date(dateReceived);
@@ -128,10 +129,9 @@ function handle_events(item, options){
 
         const { groupID } = item;
         if (issues.includes(groupID)){
-            deleteKeys = ['entries'];
-            deleteKeys.forEach(function(key){
-                // Remove huge key/value pairs that are not used
-                delete item[key];
+            remove_fields.forEach(function(field){
+                // Remove key/value pairs as specified in config (used to remove large amounts of unused data)
+                delete item[field];
             });
             value.value = item;
         }
@@ -152,14 +152,15 @@ function handle_events(item, options){
 
 }
 
-const sentry_events = async(url, auth, organization_slug, sentry_slug, period_from, period_to, issues) => {
+const sentry_events = async(url, auth, organization_slug, sentry_slug, period_from, period_to, issues, remove_fields) => {
     return new Promise(async (resolve, reject) => {
         try {
             var results = {'serverEvents':[], 'jsEvents':[]};
             const options={
                 period_from:period_from,
                 period_to:period_to,
-                issues:issues
+                issues:issues,
+                remove_fields:remove_fields
             };
             const call_result = await sentry_api_call(url + `api/0/projects/` + organization_slug + '/' + sentry_slug + '/events/', auth, handle_events, options)
 
