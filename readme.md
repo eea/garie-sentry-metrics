@@ -287,6 +287,15 @@ Be careful though, as removing fields such as "dateCreated" or "eventID" can cau
 misbehavior. Generally, removing the "entries" field should be enough to keep memory usage down.
 The "context" field is also safe to remove and will lead to a slight reduction in memory use.
 
+For an example of Sentry event structure, please see [Sentry docs].(https://docs.sentry.io/api/events/retrieve-an-event-for-a-project/)
+
+To inspect the events list for a specific project, you can also use curl:
+```bash
+# use current sentry authentication token below
+export TOKEN=0bf625ef98884915b3af2f3f878a3913b8f891b407dc4061acbc5ffcd8d53f1e
+curl -H 'Accept: application/json' -H "Authorization: Bearer ${TOKEN}" https://sentry.eea.europa.eu/api/0/projects/eea/bdr-eionet-europa-eu/events/
+```
+
 ### Configuring the filters
 For configuring the filters we have to build a json object
 Operators can be:
