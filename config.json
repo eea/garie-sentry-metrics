@@ -7,7 +7,8 @@
                     "field": "30days",
                     "days": 30
                 }
-            ]
+            ],
+            "remove_fields": ["entries"]
         }
     },
   "cron": "0 */4 * * *",
@@ -21,7 +22,8 @@
               "sentryId": 23
             }
           ],
-          "matomoId": 12
+          "matomoId": 12,
+          "remove_fields": ["entries", "context"]
         }
       }
     },
@@ -39,7 +41,8 @@
               }
             }
           ],
-          "matomoId": 12
+          "matomoId": 12,
+          "remove_fields": []
         }
       }
     },
@@ -93,7 +96,8 @@
               }
             }
           ],
-          "matomoId": 12
+          "matomoId": 12,
+          "remove_fields": ["context"]
         }
       }
     },
@@ -111,7 +115,8 @@
               }
             }
           ],
-          "matomoId": 12
+          "matomoId": 12,
+          "remove_fields": []
         }
       }
     }

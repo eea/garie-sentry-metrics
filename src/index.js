@@ -36,7 +36,8 @@ const myGetData = async (item) => {
                     console.log(`Using 'default_visitis_per_day' from configuration`)
                 }
             }
-            var {sentry_config} = item.url_settings;
+            var { sentry_config } = item.url_settings;
+            var { remove_fields } = item.url_settings;
             if (sentry_config === undefined){
                 const exception = `Missing sentry config for ${url}`
                 console.log(exception);
@@ -77,9 +78,19 @@ const myGetData = async (item) => {
                     organizationSlug = sentry_projects[sentryId].organizationSlug;
                 }
 
+                if (typeof remove_fields === 'undefined') {
+                    // No remove fields have been defined, try to use plugin default
+                    const sentry_remove_fields = config.plugins['sentry-metrics'].remove_fields;
+                    if (typeof sentry_remove_fields === 'undefined') {
+                        remove_fields = [];
+                    } else {
+                        remove_fields = sentry_remove_fields;
+                    }
+                }
+
                 const sentry_issues = await sentry_api.sentry_issues(sentry_base_url, sentry_auth, organizationSlug, sentrySlug, period_from);
 
-                const data_sentry_tmp = await sentry_api.sentry_events(sentry_base_url, sentry_auth, organizationSlug, sentrySlug, period_from, period_to, sentry_issues);
+                const data_sentry_tmp = await sentry_api.sentry_events(sentry_base_url, sentry_auth, organizationSlug, sentrySlug, period_from, period_to, sentry_issues, remove_fields);
 
                 data_sentry['jsEvents'] = data_sentry['jsEvents'].concat(data_sentry_tmp['jsEvents']);
                 data_sentry['serverEvents'] = data_sentry['serverEvents'].concat(data_sentry_tmp['serverEvents']);
