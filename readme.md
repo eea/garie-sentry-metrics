@@ -39,7 +39,7 @@ First clone the repo.
 git clone https://github.com/eea/garie-sentry-metrics.git
 ```
 
-Next setup you're config. Edit the `config.json` and add websites to the list.
+Next setup your config. Edit the `config.json` and add websites to the list.
 
 ```javascript
 {
