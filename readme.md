@@ -174,7 +174,7 @@ docker-compose up
 
 This will build your copy of `garie-sentrymetrics` and run the application.
 
-On start garie-uptimerobot will start to gather statistics for the websites added to the `config.json`.
+On start, garie-sentrymetrics will start to gather statistics for the websites added to the `config.json`.
 
 ## config.json
 
