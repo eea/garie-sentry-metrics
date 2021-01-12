@@ -362,7 +362,7 @@ This way it's possible to create complex filters like:
 }
 ```
 
-## Variables
+## Environment variables
 - URL_SENTRY - url for sentry
 - SENTRY_AUTHORIZATION - sentry authorization key
 - URL_MATOMO - url for matomo
