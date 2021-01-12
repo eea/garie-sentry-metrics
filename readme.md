@@ -297,7 +297,7 @@ curl -H 'Accept: application/json' -H "Authorization: Bearer ${TOKEN}" https://s
 ```
 
 ### Configuring the filters
-For configuring the filters we have to build a json object
+For configuring the filters we have to build a json object.
 Operators can be:
 equals, contains, startsWith, or, and, not
 equals, contains, startsWith has 2 operands: field and value
