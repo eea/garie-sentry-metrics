@@ -380,7 +380,7 @@ We generate 2 measurements:
     - sentry_events
     - value
 
-In both cases 
+In both cases: 
  - *total_visits* is read from matomo
  - *sentry_events* is the number of javascript/server errors read and filtered messages from sentry
  - *value* is sentry_events / total_visits * 100
