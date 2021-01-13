@@ -7,7 +7,7 @@ WORKDIR /usr/src/garie-plugin
 
 COPY package.json .
 
-RUN cd /usr/src/garie-plugin && npm install --force
+RUN cd /usr/src/garie-plugin && npm install --prefer-online
 
 RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb && \
     dpkg -i dumb-init_*.deb
