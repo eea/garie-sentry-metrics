@@ -8,7 +8,7 @@
 **Highlights**
 
 -   Poll for sentry and matomo statistics and stores the data into InfluxDB
--   View all historic reports.
+-   View all historic reports
 -   Setup within minutes
 
 ## Overview of garie-sentry-metrics
