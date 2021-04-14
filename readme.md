@@ -390,3 +390,4 @@ In both cases:
  - *value* is sentry_events / total_visits * 100
 
 For more information please go to the [garie-plugin](https://github.com/eea/garie-plugin) repo.
+
