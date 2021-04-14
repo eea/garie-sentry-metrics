@@ -192,6 +192,10 @@ On start, garie-sentrymetrics will start to gather statistics for the websites a
 | `plugins.sentry-metrics.remove_fields`   | `list` (optional) | A list of fields to remove from Sentry responses for each url |
 | `urls`   | `object` (required) | Config for sentrymetrics. More detail below                                          |
 
+MAX_AGE_OF_REPORT_FILES - int (default to 365), Maximum age (in days) of report files that can be deleted.
+MAX_AGE_OF_REPORT_VIDEOS - int (default to 100), Maximum age (in days) of report videos that can be deleted.
+CRON_DELETE_OLD_REPORTS - cronjob (default to '0 5 * * *') The frequency of checking old report files / videos.
+
 **urls object**
 
 | Property                                                       | Type                 | Description                                                                          |
@@ -384,3 +388,5 @@ In both cases:
  - *total_visits* is read from matomo
  - *sentry_events* is the number of javascript/server errors read and filtered messages from sentry
  - *value* is sentry_events / total_visits * 100
+
+For more information please go to the [garie-plugin](https://github.com/eea/garie-plugin) repo.
