@@ -190,11 +190,9 @@ On start, garie-sentrymetrics will start to gather statistics for the websites a
 | `plugins.sentry-metrics.intervals[i].field`   | `string` | Field name where the aggregation will be stored in influx |
 | `plugins.sentry-metrics.intervals[i].days`   | `number` | Number of days for the aggregation |
 | `plugins.sentry-metrics.remove_fields`   | `list` (optional) | A list of fields to remove from Sentry responses for each url |
-| `urls`   | `object` (required) | Config for sentrymetrics. More detail below                                          |
-
-MAX_AGE_OF_REPORT_FILES - int (default to 365), Maximum age (in days) of report files that can be deleted.
-MAX_AGE_OF_REPORT_VIDEOS - int (default to 100), Maximum age (in days) of report videos that can be deleted.
-CRON_DELETE_OLD_REPORTS - cronjob (default to '0 5 * * *') The frequency of checking old report files / videos.
+| `plugins.sentry-metrics.MAX_AGE_OF_REPORT_FILES`   | `number` (optional, default 365) | Maximum age (in days) of report files that can be deleted. |
+| `plugins.sentry-metrics.MAX_AGE_OF_REPORT_VIDEOS`   | `number` (optional, default 100) | Maximum age (in days) of report videos that can be deleted. |
+| `urls`   | `object` (required) | Config for lighthouse. More detail below |
 
 **urls object**
 
