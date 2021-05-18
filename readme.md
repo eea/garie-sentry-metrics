@@ -190,6 +190,7 @@ On start, garie-sentrymetrics will start to gather statistics for the websites a
 | `plugins.sentry-metrics.intervals[i].field`   | `string` | Field name where the aggregation will be stored in influx |
 | `plugins.sentry-metrics.intervals[i].days`   | `number` | Number of days for the aggregation |
 | `plugins.sentry-metrics.remove_fields`   | `list` (optional) | A list of fields to remove from Sentry responses for each url |
+| `plugins.sentry-metrics.max_age_of_report_files`   | `number` (optional, default 365) | Maximum age (in days) for all the files. Any older file will be deleted. |
 | `plugins.sentry-metrics.delete_files_by_type`   | `object` (optional, no default) | Configuration for deletion of custom files. (e.g. mp4 files)  |
 | `plugins.sentry-metrics.delete_files_by_type.type`   | `string` (required for 'delete_files_by_type') | The type / extension of the files we want to delete. (e.g. "mp4"). |
 | `plugins.sentry-metrics.delete_files_by_type.age`   | `number` (required for 'delete_files_by_type') | Maximum age (in days) of the custom files. Any older file will be deleted. |
