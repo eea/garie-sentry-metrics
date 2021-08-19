@@ -5,7 +5,7 @@ const sentry_api_call = async(url, auth, handler, options = {}) => {
     return new Promise(async (resolve, reject) => {
         try {
             var result = []
-            while(true){
+            while(true) {
                 var finished = false;
                 const data = await request({
                     uri: url,
@@ -163,8 +163,10 @@ const sentry_events = async(url, auth, organization_slug, sentry_slug, period_fr
                 remove_fields:remove_fields
             };
             const call_result = await sentry_api_call(url + `api/0/projects/` + organization_slug + '/' + sentry_slug + '/events/', auth, handle_events, options)
-
             call_result.forEach(function(item){
+                if (item.tags === undefined) {
+                    return;
+                }
                 const { tags } = item;
                 var slot = 'serverEvents';
                 for (var i = 0; i < tags.length; i++){
