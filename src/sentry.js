@@ -120,12 +120,12 @@ function handle_events(item, options){
     const { issues } = options;
     const { remove_fields } = options;
 
-    var { dateReceived } = item;
-    dateReceived = new Date(dateReceived);
+    var { dateCreated } = item;
+    dateCreated = new Date(dateCreated);
 
     var value = {value:{},finished:false, add:true }
 
-    if ((dateReceived >= period_from) && (dateReceived < period_to)){
+    if ((dateCreated >= period_from) && (dateCreated < period_to)){
 
         const { groupID } = item;
         if (issues.includes(groupID)){
@@ -141,11 +141,11 @@ function handle_events(item, options){
 
     }
 
-    if(dateReceived < period_from) {
+    if(dateCreated < period_from) {
         value.finished = true;
         value.add = false;
     }
-    if(dateReceived >= period_to) {
+    if(dateCreated >= period_to) {
         value.add = false;
     }
     return(value);
