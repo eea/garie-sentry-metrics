@@ -200,7 +200,26 @@ const myGetData = async (item) => {
             if (data_sentry['serverEvents'].length > 100) {
                 data_sentry['serverEvents'] = "Over 100 events. Too many to show";
             }
-            fs.outputJson(results_file, {total: total, matomo_daily_data : data_matomo, sentry_daily_data: data_sentry}, {spaces: 2})
+
+            let scores = {};
+            
+            if (total[0] !== undefined) {
+                scores['JsEvents/TotalVisits'] = {
+                    measurements: total[0].measurement,
+                    score: total[0].fields.value,
+                    tags: total[0].tags,
+                    fields: total[0].fields
+                };
+            }
+            if (total[1] !== undefined) {
+                scores['ServerErrors/TotalVisits'] = {
+                    measurements: total[1].measurement,
+                    score: total[1].fields.value,
+                    tags: total[1].tags,
+                    fields: total[1].fields
+                };
+            }
+            fs.outputJson(results_file, {scores: scores, matomo_daily_data : data_matomo, sentry_daily_data: data_sentry}, {spaces: 2})
             .then(() => console.log(`Saved sentry data file for ${url}`))
             .catch(err => {
               console.log(err)
