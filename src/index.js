@@ -197,7 +197,10 @@ const myGetData = async (item) => {
             }
             total = await intervals.updateWithIntervals(sentry_intervals, item.influx, total);
 
-            fs.outputJson(results_file, {total: total, matomo : data_matomo, sentry: data_sentry}, {spaces: 2})
+            if (data_sentry['serverEvents'].length > 100) {
+                data_sentry['serverEvents'] = "Over 100 events. Too many to show";
+            }
+            fs.outputJson(results_file, {total: total, matomo_daily_data : data_matomo, sentry_daily_data: data_sentry}, {spaces: 2})
             .then(() => console.log(`Saved sentry data file for ${url}`))
             .catch(err => {
               console.log(err)
