@@ -128,10 +128,11 @@ const myGetData = async (item) => {
             var server_errors = data_sentry.serverEvents.length;
 
             var nb_visits;
+            let data_matomo = {};
             if (matomoId !== undefined) {
                 console.log(`Getting matomo data for ${url}`);
 
-                const data_matomo = await request({
+                data_matomo = await request({
                     uri: `${process.env.URL_MATOMO}index.php?module=API&method=VisitsSummary.get&idSite=${matomoId}&period=day&date=yesterday&format=JSON&token_auth=${process.env.MATOMO_TOKEN}`,
                     json: true
                 });
@@ -140,12 +141,6 @@ const myGetData = async (item) => {
 
                 nb_visits = data_matomo.nb_visits;
 
-                var matomo_file = path.join(reportFolder, 'matomo.json');
-                fs.outputJson(matomo_file, data_matomo, {spaces: 2})
-                .then(() => console.log(`Saved matomo data file for ${url}`))
-                .catch(err => {
-                  console.log(err)
-                })
             }
             else {
                 nb_visits = default_visits_per_day;
@@ -157,6 +152,7 @@ const myGetData = async (item) => {
                 js_val = Math.max(100 - js_events / nb_visits * 100, 0);
                 server_val = Math.max(100 - server_errors / nb_visits * 100, 0);
             }
+
             total.push({
                 measurement: 'JsEvents/TotalVisits',
                 tags: { url },
@@ -169,8 +165,8 @@ const myGetData = async (item) => {
                 fields: { value: server_val, total_visits: nb_visits, sentry_events: server_errors }
             });
 
+            var results_file = path.join(reportFolder, 'sentry-metrics.json');
 
-            var sentry_file = path.join(reportFolder, 'sentry.json');
 
             if (!isDebug){
                 var data_sentry_prod = {"jsEvents":[], "serverEvents":[]};
@@ -194,16 +190,18 @@ const myGetData = async (item) => {
                 });
                 data_sentry = data_sentry_prod;
             }
-            fs.outputJson(sentry_file, data_sentry, {spaces: 2})
-            .then(() => console.log(`Saved sentry data file for ${url}`))
-            .catch(err => {
-              console.log(err)
-            })
+
             var sentry_intervals = config.plugins['sentry-metrics'].intervals
             if (sentry_intervals === undefined){
                 sentry_intervals = [{"field":"30days", "days":30}];
             }
             total = await intervals.updateWithIntervals(sentry_intervals, item.influx, total);
+
+            fs.outputJson(results_file, {total: total, matomo : data_matomo, sentry: data_sentry}, {spaces: 2})
+            .then(() => console.log(`Saved sentry data file for ${url}`))
+            .catch(err => {
+              console.log(err)
+            })
 
             resolve(total);
 

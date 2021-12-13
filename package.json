@@ -1,6 +1,6 @@
 {
     "name": "garie-sentry-metrics",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "Garie Plugin for sentry and matomo metrics",
     "engines": {
         "node": ">=6"
