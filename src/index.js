@@ -91,7 +91,6 @@ const myGetData = async (item) => {
                 const sentry_issues = await sentry_api.sentry_issues(sentry_base_url, sentry_auth, organizationSlug, sentrySlug, period_from);
 
                 const data_sentry_tmp = await sentry_api.sentry_events(sentry_base_url, sentry_auth, organizationSlug, sentrySlug, period_from, period_to, sentry_issues, remove_fields);
-
                 data_sentry['jsEvents'] = data_sentry['jsEvents'].concat(data_sentry_tmp['jsEvents']);
                 data_sentry['serverEvents'] = data_sentry['serverEvents'].concat(data_sentry_tmp['serverEvents']);
 
@@ -191,10 +190,11 @@ const myGetData = async (item) => {
                 data_sentry = data_sentry_prod;
             }
 
-            var sentry_intervals = config.plugins['sentry-metrics'].intervals
+            var sentry_intervals = config.plugins['sentry-metrics'].intervals;
             if (sentry_intervals === undefined){
                 sentry_intervals = [{"field":"30days", "days":30}];
             }
+
             total = await intervals.updateWithIntervals(sentry_intervals, item.influx, total);
 
             if (data_sentry['serverEvents'].length > 100) {
@@ -202,11 +202,10 @@ const myGetData = async (item) => {
             }
 
             let scores = {};
-            
             if (total[0] !== undefined) {
                 scores['JsEvents/TotalVisits'] = {
                     measurements: total[0].measurement,
-                    score: total[0].fields.value,
+                    score: Math.round(total[0].fields.value_7days),
                     tags: total[0].tags,
                     fields: total[0].fields
                 };
@@ -214,7 +213,7 @@ const myGetData = async (item) => {
             if (total[1] !== undefined) {
                 scores['ServerErrors/TotalVisits'] = {
                     measurements: total[1].measurement,
-                    score: total[1].fields.value,
+                    score: Math.round(total[1].fields.value_7days),
                     tags: total[1].tags,
                     fields: total[1].fields
                 };
